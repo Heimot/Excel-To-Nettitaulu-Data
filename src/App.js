@@ -58,7 +58,6 @@ function App() {
       let k;
       let ids = [];
       let orderData = null;
-      console.log(allOrders)
       for (k = 3; k < allOrders.length; k++) {
         if (k !== 0) {
           if (allOrders[k][i] > 0 && !isNaN(allOrders[k][i]) || allOrders[k][i] !== "" && !isNaN(allOrders[k][i])) {
