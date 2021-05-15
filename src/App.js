@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import XLSX from 'xlsx';
-import useFetch from './useFetch';
 import './App.css';
 
 
@@ -55,14 +54,15 @@ function App() {
     if (!allOrders) return;
     let i;
     for (i = 1; i < allOrders[0].length; i++) {
+      console.log(allOrders[i]);
       let k;
       let ids = [];
       let orderData = null;
       for (k = 3; k < allOrders.length; k++) {
         if (k !== 0) {
-          if (allOrders[k][i] > 0 && !isNaN(allOrders[k][i]) || allOrders[k][i] !== "" && !isNaN(allOrders[k][i])) {
+          if ((allOrders[k][i] > 0 && !isNaN(allOrders[k][i])) || (allOrders[k][i] !== "" && !isNaN(allOrders[k][i]))) {
             // This console.log is just for testing purposes!
-            console.log({"kukka": allOrders[k][0], "maara": allOrders[k][i]})
+            console.log({ "kukka": allOrders[k][0], "maara": allOrders[k][i], "kerayspaikka": allOrders[k][1] })
             let oneID = await fetch("http://localhost:3002/products/post", {
               method: "POST",
               headers: {
@@ -71,6 +71,7 @@ function App() {
               body: JSON.stringify({
                 kukka: allOrders[k][0],
                 toimi: allOrders[k][i],
+                kerays: allOrders[k][1],
               })
             })
             let json = await oneID.json();
@@ -78,7 +79,8 @@ function App() {
           }
         }
       }
-      orderData = {tpvm: allOrders[2][i], kpvm: allOrders[3][i], code: allOrders[1][i], kauppa: allOrders[0][i]};
+
+      orderData = { tpvm: allOrders[2][i], kpvm: allOrders[3][i], code: allOrders[1][i], kauppa: allOrders[0][i] };
       console.log(orderData)
       if (ids.length !== 0) {
         createOrder(ids, orderData);
@@ -89,7 +91,7 @@ function App() {
 
   function createOrder(ids, orderData) {
     if (!ids) return;
-    if(!orderData) return;
+    if (!orderData) return;
     fetch("http://localhost:3002/orders/post/", {
       method: "POST",
       headers: {
@@ -119,6 +121,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <h1>EXCEL TO NETTITAULU TEST</h1>
         <input type="file" accept=".xls,.xlsx,.ods" onChange={(e) => handleFile(e)}></input>
         <button onClick={() => createOrdersFromExcel()}>create</button>
       </header>
