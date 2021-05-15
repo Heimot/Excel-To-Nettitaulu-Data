@@ -18,27 +18,18 @@ function App() {
         var data = new Uint8Array(e.target.result);
         var workbook = XLSX.read(data, { type: "array" });
         var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-
-        // header: 1 instructs xlsx to create an 'array of arrays'
         var result = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-
         let i;
-
         let orders = [];
         for (i = 0; i < result.length; i++) {
           let kukka = result[i]
-
           let k;
           let woa = [];
           for (k = 0; k < kukka.length; k++) {
             let data = kukka[k];
             woa.push(data)
-
           }
           orders.push(woa);
-          /*
-    
-          */
         }
         setOrders(orders);
       };
@@ -79,7 +70,6 @@ function App() {
           }
         }
       }
-
       orderData = { tpvm: allOrders[2][i], kpvm: allOrders[3][i], code: allOrders[1][i], kauppa: allOrders[0][i] };
       console.log(orderData)
       if (ids.length !== 0) {
