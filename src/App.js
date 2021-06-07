@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import XLSX from 'xlsx';
 import './App.css';
 
@@ -6,6 +6,7 @@ import './App.css';
 
 function App() {
   const [allOrders, setOrders] = useState(null);
+  const [qr, setQR] = useState("");
 
   const handleFile = (e) => {
     try {
@@ -107,6 +108,65 @@ function App() {
 
   }
 
+  const readCard = async (e) => {
+    setQR(e.target.value)
+
+  }
+
+  const testerrr = (e) => {
+    var key = e.keyCode || e.which;
+    if (key == 13) {
+      console.log(qr)
+      setQR("");
+    }
+  }
+
+  const RFID = async() => {
+    try {
+
+      // LATAA LAITTEILLE ZADIGILLA WINUSB!!!!!!!!!! ETTÄ TOIMII
+
+      const filters = [{
+        vendorId: 0x1A86
+      }];
+      const device = await navigator.usb.requestDevice({ filters })
+
+      const configuration_number = 1  // device.configuration.configurationValue
+      const interface_number = 0      // device.configuration.interfaces[1].interfaceNumber
+      const interface_class = 255      // device.configuration.interfaces[1].alternates[0].interfaceClass
+      console.log(device);
+      console.log(`configuration number :  ${configuration_number}`);
+      console.log(`interface number : ${interface_number} `);
+      console.log(`interface class : ${interface_class} `);
+
+      await device.open();
+      await device.selectConfiguration(configuration_number);
+      await device.claimInterface(interface_number);
+      await device.controlTransferOut({
+        requestType: 'class',
+        recipient: 'interface',
+        request: 0x22,
+        value: 0x10,
+        index: interface_number
+      });
+
+      const read = async (device) => {
+        const result = await device.transferIn(2, 64);
+        const decoder = new TextDecoder();
+        const message = decoder.decode(result.data);
+        return message
+      }
+
+      var m
+      do {
+        m = await read(device)
+        console.log(m);
+      } while (m.charCodeAt(0) !== 13)
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <div className="App">
@@ -114,6 +174,14 @@ function App() {
         <h1>EXCEL TO NETTITAULU TEST</h1>
         <input type="file" accept=".xls,.xlsx,.ods" onChange={(e) => handleFile(e)}></input>
         <button onClick={() => createOrdersFromExcel()}>create</button>
+        <div>
+          <h4>JUU</h4>
+          <input onKeyPress={(e) => testerrr(e)} value={qr} id="wa" onChange={(e) => readCard(e)}></input>
+          <button onClick={() => readCard()}>Cardreader</button>
+        </div>
+        <div>
+          <button onClick={() => RFID()}>Read RFID</button>
+        </div>
       </header>
     </div>
   );
