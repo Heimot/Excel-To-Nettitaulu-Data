@@ -6,7 +6,7 @@ import './App.css';
 
 function App() {
   const [allOrders, setOrders] = useState(null);
-  const [qr, setQR] = useState("");
+  const [qr, setQR] = useState([]);
 
   const handleFile = (e) => {
     try {
@@ -108,20 +108,10 @@ function App() {
 
   }
 
-  const readCard = async (e) => {
-    setQR(e.target.value)
 
-  }
 
-  const testerrr = (e) => {
-    var key = e.keyCode || e.which;
-    if (key == 13) {
-      console.log(qr)
-      setQR("");
-    }
-  }
 
-  const RFID = async() => {
+  const RFID = async () => {
     try {
 
       // LATAA LAITTEILLE ZADIGILLA WINUSB!!!!!!!!!! ETTÄ TOIMII
@@ -160,12 +150,26 @@ function App() {
       var m
       do {
         m = await read(device)
-        console.log(m);
+        setQR(oldArr => [...oldArr, m])
+        console.log(m)
       } while (m.charCodeAt(0) !== 13)
 
     } catch (error) {
       console.log(error);
     }
+  }
+
+  const conBluetooth = async() => {
+    const blue = await navigator.bluetooth.requestDevice({
+
+        acceptAllDevices: true
+   
+    })
+    .then(device => { 
+      blue.connect()
+  
+    })
+    .catch(error => { console.error(error); });
   }
 
   return (
@@ -175,12 +179,20 @@ function App() {
         <input type="file" accept=".xls,.xlsx,.ods" onChange={(e) => handleFile(e)}></input>
         <button onClick={() => createOrdersFromExcel()}>create</button>
         <div>
-          <h4>JUU</h4>
-          <input onKeyPress={(e) => testerrr(e)} value={qr} id="wa" onChange={(e) => readCard(e)}></input>
-          <button onClick={() => readCard()}>Cardreader</button>
+          <button onClick={() => RFID()}>Read RFID</button>
         </div>
         <div>
-          <button onClick={() => RFID()}>Read RFID</button>
+          <h3>Scanned codes</h3>
+          {qr.map(code => {
+            return (
+              <div>
+                {code}
+              </div>
+            )
+          })}
+        </div>
+        <div>
+          <button onClick={() => conBluetooth()}>Web Bluetooth</button>
         </div>
       </header>
     </div>
