@@ -159,17 +159,62 @@ function App() {
     }
   }
 
-  const conBluetooth = async() => {
-    const blue = await navigator.bluetooth.requestDevice({
+  var bluetoothDevice;
 
-        acceptAllDevices: true
-   
+  const conBluetooth = async () => {
+    navigator.bluetooth.requestDevice({
+      name: "BarCode Bluetooth BLE",
+      acceptAllDevices: true
     })
-    .then(device => { 
-      blue.connect()
-  
-    })
-    .catch(error => { console.error(error); });
+      .then((device) => {
+        bluetoothDevice = device;
+        bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
+        bluetoothDevice.addEventListener('inputreport', data);
+        connect();
+      })
+      .catch(error => {
+        alert('Argh! ' + error);
+      });
+  }
+
+  function connect() {
+    exponentialBackoff(3 /* max retries */, 2 /* seconds delay */,
+      function toTry() {
+        time('Connecting to Bluetooth Device... ');
+        return bluetoothDevice.gatt.connect();
+      },
+      function success() {
+        alert('> Bluetooth Device connected. Try disconnect it now.');
+      },
+      function fail() {
+        time('Failed to reconnect.');
+      });
+  }
+
+  function data() {
+    alert("DATA GOTTEN")
+  }
+
+  function onDisconnected() {
+    alert('> Bluetooth Device disconnected');
+    connect();
+  }
+
+  function exponentialBackoff(max, delay, toTry, success, fail) {
+    toTry().then(result => success(result))
+      .catch(_ => {
+        if (max === 0) {
+          return fail();
+        }
+        time('Retrying in ' + delay + 's... (' + max + ' tries left)');
+        setTimeout(function () {
+          exponentialBackoff(--max, delay * 2, toTry, success, fail);
+        }, delay * 1000);
+      });
+  }
+
+  function time(text) {
+    alert('[' + new Date().toJSON().substr(11, 8) + '] ' + text);
   }
 
   return (
