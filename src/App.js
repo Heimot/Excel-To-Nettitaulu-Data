@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import XLSX from 'xlsx';
 import './App.css';
-
+import Blocker from './Blocker';
 
 
 function App() {
   const [allOrders, setOrders] = useState(null);
   const [qr, setQR] = useState([]);
+  const [blocked, setBlocked] = useState(true);
+  const [getUsers, setUsers] = useState(null);
 
   const handleFile = (e) => {
     try {
@@ -113,9 +115,6 @@ function App() {
 
   const RFID = async () => {
     try {
-
-      // LATAA LAITTEILLE ZADIGILLA WINUSB!!!!!!!!!! ETTÄ TOIMII
-
       const filters = [{
         vendorId: 0x1A86
       }];
@@ -217,8 +216,19 @@ function App() {
     alert('[' + new Date().toJSON().substr(11, 8) + '] ' + text);
   }
 
+  const removeBlocker = () => {
+    setBlocked(!blocked)
+  }
+
+  const userData = (users) => {
+    setUsers(users)
+  }
+
   return (
     <div className="App">
+      {blocked ?
+        <Blocker remove={() => removeBlocker()} userData={(users) => userData(users)} />
+        : null}
       <header className="App-header">
         <h1>EXCEL TO NETTITAULU TEST</h1>
         <input type="file" accept=".xls,.xlsx,.ods" onChange={(e) => handleFile(e)}></input>
@@ -239,7 +249,14 @@ function App() {
         <div>
           <button onClick={() => conBluetooth()}>Web Bluetooth</button>
         </div>
+        {getUsers ? <div>
+          <h3>USERS SCANNED BY ID</h3>
+          {getUsers.map(user => {
+            return (<div key={user}>{user}</div>)
+          })}
+        </div> : null}
       </header>
+
     </div>
   );
 }

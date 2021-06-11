@@ -1,0 +1,56 @@
+.blocked {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 10000000;
+    background-color: grey;
+    background: rgba(62, 62, 54, 0.8);
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+}
+
+.fading {
+
+    color: white;
+    animation: fading 10s infinite;
+    -webkit-animation: fading 10s infinite;
+    border-radius:5px;
+    user-select: none;
+}
+
+@keyframes fading {
+    0%   { color: #23fa80; }
+    33%  { color: #ff0331; }
+    66%  { color: #23fa80; }
+    100% { color: #ff0331; }
+}
+
+@-webkit-keyframes fading {
+    0%   { color: #23fa80; }
+    33%  { color: #ff0331; }
+    66%  { color: #23fa80; }
+    100% { color: #ff0331; }
+}
+@keyframes opacityfading {
+    0%   { opacity: 0; }
+    33%  { opacity: 1; }
+    66%  { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@-webkit-keyframes opacityfading {
+    0%   { opacity: 0; }
+    33%  { opacity: 1; }
+    66%  { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.fade {
+    color: #23fa80;
+    user-select: none;
+}
