@@ -5,7 +5,7 @@ let touchId = "";
 let scan = false;
 let timeOut = null;
 
-// SCANNING USERS USING IDENTIV KDB WEDGE AND UTRUST 4701F
+// SCANNING USERS USING IDENTIV KBD WEDGE AND UTRUST 4701F
 
 function Blocker({ remove, userData }) {
     const [ids, setIds] = useState([]);

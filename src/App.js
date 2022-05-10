@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import XLSX from 'xlsx';
 import './App.css';
 import Blocker from './Blocker';
+import JsBarcode from 'jsbarcode';
 
 
 function App() {
@@ -60,7 +61,8 @@ function App() {
             let oneID = await fetch("http://localhost:3002/products/post", {
               method: "POST",
               headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '
               },
               body: JSON.stringify({
                 kukka: allOrders[k][0],
@@ -73,7 +75,7 @@ function App() {
           }
         }
       }
-      orderData = { tpvm: allOrders[2][i], kpvm: allOrders[3][i], code: allOrders[1][i], kauppa: allOrders[0][i] };
+      orderData = { tpvm: allOrders[3][i], kpvm: allOrders[4][i], code: allOrders[1][i], kauppa: allOrders[0][i], lisatieto: allOrders[2][i] };
       console.log(orderData)
       if (ids.length !== 0) {
         createOrder(ids, orderData);
@@ -88,14 +90,15 @@ function App() {
     fetch("http://localhost:3002/orders/post/", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '
       },
       body: JSON.stringify({
         kauppa: orderData.kauppa,
         date: orderData.kpvm,
         toimituspvm: orderData.tpvm,
         orderLisatieto: orderData.code,
-        alisatieto: "Excel import works!!!!",
+        alisatieto: orderData.lisatieto,
         products: ids
 
       })
@@ -224,9 +227,11 @@ function App() {
     setUsers(users)
   }
 
+
+
   return (
     <div className="App">
-      {blocked ?
+      {!blocked ?
         <Blocker remove={() => removeBlocker()} userData={(users) => userData(users)} />
         : null}
       <header className="App-header">
@@ -246,15 +251,16 @@ function App() {
             )
           })}
         </div>
-        <div>
+        {/*<div>
           <button onClick={() => conBluetooth()}>Web Bluetooth</button>
-        </div>
-        {getUsers ? <div>
+        </div>*/}
+
+        <div>
           <h3>USERS SCANNED BY ID</h3>
-          {getUsers.map(user => {
+          {getUsers?.map(user => {
             return (<div key={user}>{user}</div>)
           })}
-        </div> : null}
+        </div>
       </header>
 
     </div>
